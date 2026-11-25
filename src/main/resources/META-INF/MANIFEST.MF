@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+MIDlet-Name: Loan 12 Su Quan
+MIDlet-Version: 1.19.3
+MIDlet-Vendor: MicroGame Corp.
+MIDlet-1: Loan 12 Su Quan,/icon.png,com.mic.smsgame.suquan.SQMidlet
+MicroEdition-Profile: MIDP-2.0
+MicroEdition-Configuration: CLDC-1.0
+

@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="12 Sứ Quân HD" />
+  <meta name="theme-color" content="#120905" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>Loạn 12 Sứ Quân HD — Cổ Phong Hoàng Kim (Web &amp; iPhone 17 Edition)</title>
+
+  <link rel="icon" type="image/png" href="icons/favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+
+  <style>
+    :root {
+      --bg-deep: #100804;
+      --bg-card: #24150d;
+      --gold-bright: #fff3b0;
+      --gold-mid: #d9a441;
+      --gold-dark: #7a541e;
+      --jade-accent: #227a68;
+      --crimson-accent: #7a1e24;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      overscroll-behavior: none;
+      background: radial-gradient(circle at 50% 38%, #29160d 0%, #140a05 62%, #0a0503 100%);
+      color: #f6e7c8;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      touch-action: none;
+    }
+
+    #app-shell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 100%;
+      padding-top: max(6px, calc(var(--safe-top) + 4px));
+      padding-bottom: max(6px, calc(var(--safe-bottom) + 4px));
+      padding-left: max(6px, var(--safe-left));
+      padding-right: max(6px, var(--safe-right));
+      gap: 6px;
+    }
+
+    /* Compact Cổ Phong Quick Utility Bar (clears Dynamic Island on iPhone 17) */
+    #top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 6px;
+      width: 100%;
+      max-width: 540px;
+      min-height: 32px;
+      z-index: 20;
+    }
+
+    .pill-btn {
+      appearance: none;
+      border: 1px solid rgba(217, 164, 65, 0.68);
+      background: linear-gradient(180deg, #382315 0%, #1d110a 100%);
+      color: var(--gold-bright);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 243, 176, 0.22);
+      white-space: nowrap;
+      transition: transform 0.08s ease, border-color 0.15s ease;
+    }
+
+    .pill-btn:active {
+      transform: scale(0.95);
+      border-color: #fff3b0;
+    }
+
+    .pill-btn.jade {
+      background: linear-gradient(180deg, #1f6959 0%, #103830 100%);
+      border-color: rgba(132, 245, 222, 0.72);
+    }
+
+    .pill-btn.crimson {
+      background: linear-gradient(180deg, #6b1d23 0%, #360d10 100%);
+    }
+
+    /* Responsive 3:4 Retina Playfield Stage */
+    #stage-wrap {
+      position: relative;
+      flex: 1 1 auto;
+      width: 100%;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #canvas-frame {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      height: 100%;
+      max-height: 100%;
+      max-width: 100%;
+      border-radius: 12px;
+      border: 2px solid #c9963e;
+      box-shadow:
+        0 12px 36px rgba(0, 0, 0, 0.82),
+        0 0 24px rgba(217, 164, 65, 0.16),
+        inset 0 0 0 1px rgba(255, 245, 190, 0.28);
+      overflow: hidden;
+      background: #120905;
+      touch-action: none;
+    }
+
+    @media (min-aspect-ratio: 3/4) {
+      #canvas-frame {
+        height: 100%;
+        width: auto;
+      }
+    }
+
+    @media (max-aspect-ratio: 3/4) {
+      #canvas-frame {
+        width: 100%;
+        height: auto;
+      }
+    }
+
+    #game-canvas,
+    #fx-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+
+    #fx-canvas {
+      pointer-events: none;
+    }
+
+    #pc-hint {
+      font-size: 11px;
+      color: rgba(232, 213, 181, 0.72);
+      text-align: center;
+      display: none;
+    }
+
+    @media (pointer: fine) and (min-height: 760px) {
+      #pc-hint {
+        display: block;
+      }
+    }
+
+    /* Startup Loading Screen */
+    #boot-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: radial-gradient(circle at 50% 42%, #33190f 0%, #140a06 68%, #090402 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      transition: opacity 0.32s ease;
+    }
+
+    #boot-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .boot-badge {
+      width: 88px;
+      height: 88px;
+      border-radius: 22px;
+      border: 2px solid #e8bc66;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.7), 0 0 24px rgba(255, 196, 77, 0.28);
+      margin-bottom: 16px;
+    }
+
+    .boot-subtitle {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #7cf5dc;
+      margin-bottom: 6px;
+    }
+
+    .boot-title {
+      font-family: Georgia, "Palatino Linotype", serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--gold-bright);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+      margin-bottom: 18px;
+    }
+
+    .boot-bar-track {
+      width: min(280px, 80vw);
+      height: 12px;
+      border-radius: 999px;
+      background: #0d0604;
+      border: 1px solid #9e7332;
+      overflow: hidden;
+      padding: 2px;
+      margin-bottom: 10px;
+    }
+
+    #boot-bar-fill {
+      width: 8%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #24a88c 0%, #7cf5dc 55%, #fff3b0 100%);
+      transition: width 0.18s ease;
+    }
+
+    #boot-status {
+      font-size: 13px;
+      color: #e6d4b5;
+    }
+
+    /* Modals (Save Backup .sqhd & iPhone 17 Add-to-Home-Screen Guide) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      background: rgba(8, 4, 2, 0.82);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(380px, 92vw);
+      background: linear-gradient(180deg, #331f13 0%, #1a0f09 100%);
+      border: 2px solid #d4a24c;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+      color: #f7ead0;
+    }
+
+    .modal-card h3 {
+      font-size: 17px;
+      color: var(--gold-bright);
+      text-align: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(212, 162, 76, 0.35);
+    }
+
+    .modal-card p,
+    .modal-card li {
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: #ecdcc0;
+    }
+
+    .modal-card ol {
+      padding-left: 20px;
+      margin: 10px 0 14px;
+    }
+
+    .modal-card li + li {
+      margin-top: 6px;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .modal-btn {
+      appearance: none;
+      border: 1px solid #d9a441;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold-bright);
+      background: linear-gradient(180deg, #246b5c 0%, #123b32 100%);
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .modal-btn.secondary {
+      background: linear-gradient(180deg, #4a2f1d 0%, #26170e 100%);
+    }
+
+    .modal-btn.close {
+      background: linear-gradient(180deg, #611d22 0%, #330d10 100%);
+    }
+
+    #save-msg {
+      margin-top: 8px;
+      font-size: 12.5px;
+      text-align: center;
+      color: #8cf5e0;
+      min-height: 18px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Boot Preloader -->
+  <div id="boot-overlay">
+    <img class="boot-badge" src="icons/apple-touch-icon.png" alt="Loạn 12 Sứ Quân HD" />
+    <div class="boot-subtitle">ĐẠI CỒ VIỆT • BẢN WEB &amp; IPHONE 17 HD</div>
+    <div class="boot-title">LOẠN 12 SỨ QUÂN</div>
+    <div class="boot-bar-track">
+      <div id="boot-bar-fill"></div>
+    </div>
+    <div id="boot-status">Đang khởi tạo tài nguyên Cổ Phong HD...</div>
+  </div>
+
+  <!-- Main Responsive Safe-Area Shell -->
+  <div id="app-shell">
+    <div id="top-bar">
+      <button id="btn-sound" class="pill-btn jade" type="button" title="Đổi mức âm lượng">Âm: 80%</button>
+      <button id="btn-hd" class="pill-btn" type="button" title="Đổi chế độ đồ họa HD">HD: Tối đa</button>
+      <button id="btn-save" class="pill-btn" type="button" title="Sao lưu hoặc khôi phục tiến trình (.sqhd)">Lưu trữ</button>
+      <button id="btn-pwa" class="pill-btn jade" type="button" style="display:none" title="Cài đặt toàn màn hình lên iPhone">Cài App</button>
+      <button id="btn-back" class="pill-btn crimson" type="button" title="Phím phải / Trở về">Trở về</button>
+    </div>
+
+    <div id="stage-wrap">
+      <div id="canvas-frame">
+        <canvas id="game-canvas" width="720" height="960"></canvas>
+        <canvas id="fx-canvas" width="720" height="960"></canvas>
+      </div>
+    </div>
+
+    <div id="pc-hint">
+      Chạm / Vuốt trực tiếp trên iPhone 17 • Phím PC: W/A/S/D hoặc Mũi tên, Enter, Q/E, F2 (HD), F3 (Âm lượng)
+    </div>
+  </div>
+
+  <!-- Save Export / Import (.sqhd) Modal -->
+  <div id="save-modal" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h3>SAO LƯU QUÂN VỤ (.SQHD)</h3>
+      <p>
+        Tiến trình chiến dịch tự động lưu trên thiết bị. Bạn cũng có thể xuất tệp
+        <strong>.sqhd</strong> để cất vào Tệp (iCloud Drive) trên iPhone 17 hoặc chuyển qua lại với bản PC.
+      </p>
+      <div id="save-msg"></div>
+      <div class="modal-actions">
+        <button id="btn-export-sqhd" class="modal-btn" type="button">⬇ Tải tệp sao lưu (.sqhd)</button>
+        <button id="btn-import-sqhd" class="modal-btn secondary" type="button">⬆ Khôi phục từ tệp (.sqhd)</button>
+        <input id="file-import-sqhd" type="file" accept=".sqhd,application/octet-stream" style="display:none" />
+        <button id="btn-close-save" class="modal-btn close" type="button">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- iPhone 17 Home Screen PWA Installation Modal -->
+  <div id="pwa-modal" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h3>CÀI LÊN MÀN HÌNH CHÍNH IPHONE 17</h3>
+      <p>Chơi <strong>Loạn 12 Sứ Quân HD</strong> toàn màn hình (ẩn thanh Safari, tự căn né Dynamic Island &amp; chơi offline không cần mạng):</p>
+      <ol>
+        <li>Chạm biểu tượng <strong>Chia sẻ (Share ⬆)</strong> ở thanh dưới của trình duyệt Safari.</li>
+        <li>Cuộn xuống và chọn <strong>Thêm vào Màn hình chính</strong> (<em>Add to Home Screen</em>).</li>
+        <li>Chạm <strong>Thêm (Add)</strong> ở góc trên phải rồi mở biểu tượng <strong>12 Sứ Quân HD</strong> ngoài màn hình chính!</li>
+      </ol>
+      <div class="modal-actions">
+        <button id="btn-close-pwa" class="modal-btn close" type="button">Đã hiểu</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sqhd-audio-text.js?v=2.1.4"></script>
+  <script>
+    (function () {
+      "use strict";
+
+      var bootOverlay = document.getElementById("boot-overlay");
+      var bootFill = document.getElementById("boot-bar-fill");
+      var bootStatus = document.getElementById("boot-status");
+      var gameCanvas = document.getElementById("game-canvas");
+      var fxCanvas = document.getElementById("fx-canvas");
+      var fxCtx = fxCanvas.getContext("2d");
+
+      var pointerCb = null;
+      var keyCb = null;
+      var cmdCb = null;
+
+      function setBootProgress(pct, text) {
+        bootFill.style.width = Math.max(5, Math.min(100, pct)) + "%";
+        if (text) bootStatus.textContent = text;
+      }
+
+      // =====================================================================
+      // 1. 60 FPS PRE-BAKED SPRITE GOLDEN EMBERS & TOUCH SPARKS (ZERO ALLOC)
+      // =====================================================================
+      var glowSprite = document.createElement("canvas");
+      glowSprite.width = 48;
+      glowSprite.height = 48;
+      (function () {
+        var gCtx = glowSprite.getContext("2d");
+        var rg = gCtx.createRadialGradient(24, 24, 0, 24, 24, 24);
+        rg.addColorStop(0.0, "rgba(255, 250, 195, 1)");
+        rg.addColorStop(0.45, "rgba(255, 212, 95, 0.55)");
+        rg.addColorStop(1.0, "rgba(255, 175, 40, 0)");
+        gCtx.fillStyle = rg;
+        gCtx.fillRect(0, 0, 48, 48);
+      })();
+
+      var embers = [];
+      var sparks = [];
+      for (var i = 0; i < 24; ++i) {
+        embers.push({
+          x: Math.random() * 720,
+          y: Math.random() * 960,
+          vx: (Math.random() - 0.5) * 16,
+          vy: -(14 + Math.random() * 24),
+          r: 6 + Math.random() * 9,
+          a: 0.16 + Math.random() * 0.24,
+          p: Math.random() * 6.28
+        });
+      }
+
+      function spawnSparkBurst(hx, hy) {
+        for (var k = 0; k < 10; ++k) {
+          var ang = Math.random() * Math.PI * 2;
+          var spd = 35 + Math.random() * 105;
+          var life = 0.24 + Math.random() * 0.18;
+          sparks.push({
+            x: hx,
+            y: hy,
+            vx: Math.cos(ang) * spd,
+            vy: Math.sin(ang) * spd,
+            life: life,
+            maxLife: life
+          });
+        }
+      }
+
+      function stepFx(dt) {
+        fxCtx.clearRect(0, 0, 720, 960);
+        fxCtx.globalCompositeOperation = "lighter";
+
+        for (var i = 0; i < embers.length; ++i) {
+          var e = embers[i];
+          e.p += dt * 2.3;
+          e.x += (e.vx + Math.sin(e.p) * 9) * dt;
+          e.y += e.vy * dt;
+          if (e.y < -16) {
+            e.y = 976;
+            e.x = Math.random() * 720;
+          }
+          fxCtx.globalAlpha = e.a * (0.65 + 0.35 * Math.sin(e.p));
+          var d = e.r * 2;
+          fxCtx.drawImage(glowSprite, e.x - e.r, e.y - e.r, d, d);
+        }
+
+        for (var s = sparks.length - 1; s >= 0; --s) {
+          var sp = sparks[s];
+          sp.life -= dt;
+          if (sp.life <= 0) {
+            sparks.splice(s, 1);
+            continue;
+          }
+          sp.x += sp.vx * dt;
+          sp.y += sp.vy * dt;
+          sp.vy += 180 * dt;
+          var ratio = sp.life / sp.maxLife;
+          var rad = 6 + 9 * ratio;
+          fxCtx.globalAlpha = ratio * 0.9;
+          fxCtx.drawImage(glowSprite, sp.x - rad, sp.y - rad, rad * 2, rad * 2);
+        }
+        fxCtx.globalAlpha = 1.0;
+      }
+
+      // =====================================================================
+      // 2. TOUCH, MOUSE & KEYBOARD INPUT ROUTING (240x320 LOGICAL PRECISION)
+      // =====================================================================
+      function clientToLogical(clientX, clientY) {
+        var rect = gameCanvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) return { x: 0, y: 0 };
+        var lx = Math.floor(((clientX - rect.left) / rect.width) * 240);
+        var ly = Math.floor(((clientY - rect.top) / rect.height) * 320);
+        if (lx < 0) lx = 0; else if (lx > 239) lx = 239;
+        if (ly < 0) ly = 0; else if (ly > 319) ly = 319;
+        return { x: lx, y: ly };
+      }
+
+      var activeTouchId = null;
+      var lastTouchTimestamp = 0;
+
+      gameCanvas.addEventListener("touchstart", function (e) {
+        e.preventDefault();
+        lastTouchTimestamp = Date.now();
+        if (window.__SQHD_AUDIO && window.__SQHD_AUDIO.resumeIfSuspended) {
+          window.__SQHD_AUDIO.resumeIfSuspended();
+        }
+        if (!pointerCb || !e.changedTouches.length) return;
+        var t = e.changedTouches[0];
+        activeTouchId = t.identifier;
+        var pt = clientToLogical(t.clientX, t.clientY);
+        pointerCb(0, pt.x, pt.y, 0);
+      }, { passive: false });
+
+      gameCanvas.addEventListener("touchmove", function (e) {
+        e.preventDefault();
+        if (!pointerCb || activeTouchId === null) return;
+        for (var i = 0; i < e.changedTouches.length; ++i) {
+          var t = e.changedTouches[i];
+          if (t.identifier === activeTouchId) {
+            var pt = clientToLogical(t.clientX, t.clientY);
+            pointerCb(1, pt.x, pt.y, 0);
+            break;
+          }
+        }
+      }, { passive: false });
+
+      function onTouchFinish(e) {
+        e.preventDefault();
+        lastTouchTimestamp = Date.now();
+        if (!pointerCb) return;
+        for (var i = 0; i < e.changedTouches.length; ++i) {
+          var t = e.changedTouches[i];
+          if (activeTouchId === null || t.identifier === activeTouchId) {
+            var pt = clientToLogical(t.clientX, t.clientY);
+            pointerCb(20, pt.x, pt.y, 0);
+            activeTouchId = null;
+            break;
+          }
+        }
+      }
+      gameCanvas.addEventListener("touchend", onTouchFinish, { passive: false });
+      gameCanvas.addEventListener("touchcancel", onTouchFinish, { passive: false });
+
+      // Prevent iOS Safari pinch/double-tap zoom gestures anywhere on shell
+      document.addEventListener("gesturestart", function (e) { e.preventDefault(); }, { passive: false });
+
+      var mouseDown = false;
+      gameCanvas.addEventListener("mousedown", function (e) {
+        if (Date.now() - lastTouchTimestamp < 600) return;
+        if (window.__SQHD_AUDIO && window.__SQHD_AUDIO.resumeIfSuspended) {
+          window.__SQHD_AUDIO.resumeIfSuspended();
+        }
+        if (!pointerCb) return;
+        if (e.button === 2) {
+          pointerCb(6, 0, 0, 0);
+          return;
+        }
+        mouseDown = true;
+        var pt = clientToLogical(e.clientX, e.clientY);
+        pointerCb(0, pt.x, pt.y, 0);
+      });
+
+      window.addEventListener("mousemove", function (e) {
+        if (Date.now() - lastTouchTimestamp < 600 || !pointerCb) return;
+        var pt = clientToLogical(e.clientX, e.clientY);
+        pointerCb(mouseDown ? 1 : 3, pt.x, pt.y, 0);
+      });
+
+      window.addEventListener("mouseup", function (e) {
+        if (Date.now() - lastTouchTimestamp < 600 || !mouseDown) return;
+        mouseDown = false;
+        if (!pointerCb) return;
+        var pt = clientToLogical(e.clientX, e.clientY);
+        pointerCb(2, pt.x, pt.y, 0);
+      });
+
+      gameCanvas.addEventListener("mouseleave", function () {
+        if (!mouseDown && pointerCb) pointerCb(4, -100, -100, 0);
+      });
+
+      gameCanvas.addEventListener("contextmenu", function (e) {
+        e.preventDefault();
+      });
+
+      gameCanvas.addEventListener("wheel", function (e) {
+        e.preventDefault();
+        if (!pointerCb || e.deltaY === 0) return;
+        pointerCb(5, 0, 0, e.deltaY > 0 ? 1 : -1);
+      }, { passive: false });
+
+      function mapDomKeyToMidp(e) {
+        switch (e.code) {
+          case "ArrowUp": case "KeyW": return -1;
+          case "ArrowDown": case "KeyS": return -2;
+          case "ArrowLeft": case "KeyA": return -3;
+          case "ArrowRight": case "KeyD": return -4;
+          case "Enter": case "NumpadEnter": case "Space": return -5;
+          case "KeyQ": case "F1": case "Tab": return -6;
+          case "KeyE": case "Escape": return -7;
+          case "Backspace": case "Delete": return 8;
+          default:
+            if (e.key && e.key.length === 1) {
+              var ch = e.key.charCodeAt(0);
+              if (ch >= 48 && ch <= 57) return ch;
+              if (e.key === "*") return 42;
+              if (e.key === "#") return 35;
+            }
+            return 0;
+        }
+      }
+
+      window.addEventListener("keydown", function (e) {
+        if (e.code === "F2") { e.preventDefault(); document.getElementById("btn-hd").click(); return; }
+        if (e.code === "F3") { e.preventDefault(); document.getElementById("btn-sound").click(); return; }
+        if (!keyCb) return;
+        var midp = mapDomKeyToMidp(e);
+        var typed = (e.key && e.key.length === 1) ? e.key.charCodeAt(0) : 0;
+        if (midp !== 0 || typed !== 0) {
+          if (e.code === "Space" || e.code === "Tab" || e.code.indexOf("Arrow") === 0) e.preventDefault();
+          keyCb(0, midp === 8 ? 8 : midp, typed);
+          if (typed > 0) keyCb(2, 0, typed);
+        }
+      });
+
+      window.addEventListener("keyup", function (e) {
+        if (!keyCb) return;
+        var midp = mapDomKeyToMidp(e);
+        if (midp !== 0 && midp !== 8) {
+          keyCb(1, midp, 0);
+        }
+      });
+
+      // =====================================================================
+      // 3. TOP QUICK TOOLBAR, .SQHD SAVE BACKUP & IPHONE 17 PWA GUIDE
+      // =====================================================================
+      var btnSound = document.getElementById("btn-sound");
+      var btnHd = document.getElementById("btn-hd");
+      var btnSave = document.getElementById("btn-save");
+      var btnPwa = document.getElementById("btn-pwa");
+      var btnBack = document.getElementById("btn-back");
+
+      function refreshToolbarBadges() {
+        if (!cmdCb) return;
+        var vol = parseInt(cmdCb("getVolume", ""), 10);
+        btnSound.textContent = vol > 0 ? ("Âm: " + vol + "%") : "Âm: Tắt";
+        var hd = cmdCb("getHdLabel", "");
+        if (hd) btnHd.textContent = hd;
+      }
+
+      btnSound.addEventListener("click", function () {
+        if (window.__SQHD_AUDIO && window.__SQHD_AUDIO.resumeIfSuspended) {
+          window.__SQHD_AUDIO.resumeIfSuspended();
+        }
+        if (!cmdCb) return;
+        var vol = parseInt(cmdCb("cycleVolume", ""), 10);
+        btnSound.textContent = vol > 0 ? ("Âm: " + vol + "%") : "Âm: Tắt";
+      });
+
+      btnHd.addEventListener("click", function () {
+        if (!cmdCb) return;
+        var label = cmdCb("toggleHd", "");
+        if (label) btnHd.textContent = label;
+      });
+
+      btnBack.addEventListener("click", function () {
+        if (cmdCb) cmdCb("back", "");
+      });
+
+      // Save Backup Modal
+      var saveModal = document.getElementById("save-modal");
+      var saveMsg = document.getElementById("save-msg");
+      var fileImport = document.getElementById("file-import-sqhd");
+
+      btnSave.addEventListener("click", function () {
+        saveMsg.textContent = "";
+        saveModal.classList.add("open");
+      });
+      document.getElementById("btn-close-save").addEventListener("click", function () {
+        saveModal.classList.remove("open");
+      });
+      document.getElementById("btn-export-sqhd").addEventListener("click", function () {
+        if (!cmdCb) return;
+        var b64 = cmdCb("exportSave", "");
+        if (!b64) {
+          saveMsg.textContent = "Chưa có dữ liệu lưu để xuất.";
+          return;
+        }
+        var raw = window.atob(b64);
+        var u8 = new Uint8Array(raw.length);
+        for (var i = 0; i < raw.length; ++i) u8[i] = raw.charCodeAt(i) & 255;
+        var blob = new Blob([u8], { type: "application/octet-stream" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        var dateTag = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = "Loan12SuQuanHD-" + dateTag + ".sqhd";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+        saveMsg.textContent = "Đã tải tệp sao lưu .sqhd thành công!";
+      });
+
+      document.getElementById("btn-import-sqhd").addEventListener("click", function () {
+        fileImport.value = "";
+        fileImport.click();
+      });
+
+      fileImport.addEventListener("change", function () {
+        if (!fileImport.files || !fileImport.files.length || !cmdCb) return;
+        var file = fileImport.files[0];
+        var reader = new FileReader();
+        reader.onload = function () {
+          var u8 = new Uint8Array(reader.result);
+          var bin = "";
+          for (var i = 0; i < u8.length; ++i) bin += String.fromCharCode(u8[i]);
+          var b64 = window.btoa(bin);
+          var res = cmdCb("importSave", b64);
+          if (res === "OK") {
+            saveMsg.textContent = "Khôi phục thành công! Đang tải lại chiến dịch...";
+            setTimeout(function () { window.location.reload(); }, 650);
+          } else {
+            saveMsg.textContent = "Tệp không hợp lệ (" + res + ").";
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      });
+
+      // iPhone / iOS Safari Home Screen Install Helper
+      var isStandalone = (window.navigator.standalone === true) ||
+        (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+      var isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      var deferredInstallPrompt = null;
+
+      if (!isStandalone && isIos) {
+        btnPwa.style.display = "inline-block";
+      }
+      window.addEventListener("beforeinstallprompt", function (e) {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        if (!isStandalone) btnPwa.style.display = "inline-block";
+      });
+
+      var pwaModal = document.getElementById("pwa-modal");
+      btnPwa.addEventListener("click", function () {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          deferredInstallPrompt = null;
+          return;
+        }
+        pwaModal.classList.add("open");
+      });
+      document.getElementById("btn-close-pwa").addEventListener("click", function () {
+        pwaModal.classList.remove("open");
+      });
+
+      // =====================================================================
+      // 4. ASSET PACK PRELOADER -> TEAVM BOOTSTRAP
+      // =====================================================================
+      window.__SQHD_ASSETS = { images: Object.create(null), binary: Object.create(null) };
+      window.__SQHD_BOOT = {
+        bindRuntime: function (pCb, kCb, cCb) {
+          pointerCb = pCb;
+          keyCb = kCb;
+          cmdCb = cCb;
+          setTimeout(refreshToolbarBadges, 250);
+          setInterval(refreshToolbarBadges, 1500);
+        },
+        spawnSparkBurst: spawnSparkBurst,
+        stepFx: stepFx
+      };
+
+      function decodeBase64ToUint8(b64) {
+        var raw = window.atob(b64);
+        var out = new Uint8Array(raw.length);
+        for (var i = 0; i < raw.length; ++i) out[i] = raw.charCodeAt(i) & 255;
+        return out;
+      }
+
+      function decodePngToCanvas(path, b64) {
+        return new Promise(function (resolve, reject) {
+          var img = new Image();
+          img.onload = function () {
+            var c = document.createElement("canvas");
+            c.width = img.naturalWidth || img.width || 1;
+            c.height = img.naturalHeight || img.height || 1;
+            var ctx = c.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            window.__SQHD_ASSETS.images[path] = c;
+            resolve();
+          };
+          img.onerror = function () {
+            reject(new Error("Không tải được ảnh " + path));
+          };
+          img.src = "data:image/png;base64," + b64;
+        });
+      }
+
+      function loadScript(src) {
+        return new Promise(function (resolve, reject) {
+          var s = document.createElement("script");
+          s.src = src;
+          s.onload = resolve;
+          s.onerror = function () { reject(new Error("Không tải được mã nguồn " + src)); };
+          document.body.appendChild(s);
+        });
+      }
+
+      setBootProgress(15, "Đang tải gói đồ họa & âm thanh Cổ Phong...");
+      fetch("assets-pack.json?v=2.1.4")
+        .then(function (res) {
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return res.json();
+        })
+        .then(function (pack) {
+          setBootProgress(42, "Đang giải mã 131 họa tiết & ngọc bàn cờ HD...");
+          var binMap = pack.binary || {};
+          for (var bPath in binMap) {
+            window.__SQHD_ASSETS.binary[bPath] = decodeBase64ToUint8(binMap[bPath]);
+          }
+          var imgMap = pack.images || {};
+          var keys = Object.keys(imgMap);
+          var done = 0;
+          return Promise.all(keys.map(function (k) {
+            return decodePngToCanvas(k, imgMap[k]).then(function () {
+              done++;
+              if ((done & 15) === 0 || done === keys.length) {
+                setBootProgress(42 + Math.round((done / keys.length) * 33), "Đang chuẩn bị đồ họa HD (" + done + "/" + keys.length + ")...");
+              }
+            });
+          }));
+        })
+        .then(function () {
+          setBootProgress(82, "Đang nạp nhân trò chơi Loạn 12 Sứ Quân HD...");
+          return loadScript("js/classes.js?v=2.1.4");
+        })
+        .then(function () {
+          setBootProgress(100, "Khởi chạy Đại Cồ Việt HD!");
+          if (typeof main === "function") {
+            main([]);
+          } else {
+            throw new Error("Không tìm thấy hàm khởi chạy main()");
+          }
+          setTimeout(function () {
+            bootOverlay.classList.add("hidden");
+          }, 180);
+        })
+        .catch(function (err) {
+          console.error(err);
+          bootStatus.textContent = "Lỗi khởi động: " + (err && err.message ? err.message : err);
+          bootStatus.style.color = "#ff8585";
+        });
+
+      // On HTTPS production, register Offline PWA Service Worker; on localhost dev, purge stale SW caches automatically
+      if ("serviceWorker" in navigator) {
+        if (location.protocol === "https:") {
+          window.addEventListener("load", function () {
+            navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" }).then(function (reg) {
+              reg.update();
+            }).catch(function () {});
+          });
+        } else {
+          navigator.serviceWorker.getRegistrations().then(function (regs) {
+            regs.forEach(function (r) { r.unregister(); });
+          }).catch(function () {});
+          if (window.caches && window.caches.keys) {
+            window.caches.keys().then(function (keys) {
+              keys.forEach(function (k) { window.caches.delete(k); });
+            }).catch(function () {});
+          }
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

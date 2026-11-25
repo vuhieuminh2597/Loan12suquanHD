@@ -1,0 +1,36 @@
+{
+  "name": "Loạn 12 Sứ Quân HD — Cổ Phong Hoàng Kim",
+  "short_name": "12 Sứ Quân HD",
+  "description": "Tựa game nhập vai giải đố chiến thuật Loạn 12 Sứ Quân bản nâng cấp Vector HD (720x960), tối ưu cho iPhone 17 & trình duyệt Web.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#120905",
+  "theme_color": "#120905",
+  "lang": "vi",
+  "icons": [
+    {
+      "src": "icons/favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

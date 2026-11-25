@@ -1,0 +1,26 @@
+# Gradle & Java build outputs (anchored to project/subproject roots so package ".../web/build/" is never ignored!)
+/.gradle/
+/build/
+/web/build/
+/out/
+/dist/
+
+# Local campaign & RMS save files
+/saves/
+*.rms
+*.sqhd
+
+# IntelliJ IDEA local state (keep .idea/runConfigurations/ shared)
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/caches/
+.idea/shelf/
+.idea/dataSources/
+.idea/httpRequests/
+
+# Logs & OS metadata
+*.log
+hs_err_pid*
+.DS_Store
+Thumbs.db
+Desktop.ini

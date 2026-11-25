@@ -1,0 +1,89 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.loan12suquan.hd'
+version = '2.0.0-HD'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    teavmVersion = '0.10.2'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', '../src/main/java']
+            exclude 'com/loan12suquan/hd/DesktopLauncher.java'
+            exclude 'com/loan12suquan/hd/Loan12SuQuanHdGame.java'
+            exclude 'com/loan12suquan/hd/desktop/**'
+        }
+    }
+    tools {
+        java {
+            srcDirs = ['src/tools/java']
+        }
+    }
+}
+
+configurations {
+    toolsImplementation.extendsFrom(implementation)
+}
+
+dependencies {
+    compileOnly "org.teavm:teavm-jso:${teavmVersion}"
+    compileOnly "org.teavm:teavm-jso-apis:${teavmVersion}"
+
+    toolsImplementation rootProject
+    toolsImplementation "org.teavm:teavm-tooling:${teavmVersion}"
+    toolsImplementation "org.teavm:teavm-classlib:${teavmVersion}"
+    toolsImplementation "org.teavm:teavm-jso-apis:${teavmVersion}"
+    toolsImplementation "org.teavm:teavm-jso-impl:${teavmVersion}"
+}
+
+tasks.register('compileTeaVm', JavaExec) {
+    dependsOn tasks.named('classes'), tasks.named('toolsClasses'), rootProject.tasks.named('classes')
+    mainClass = 'com.loan12suquan.hd.web.build.WebBuildTool'
+    classpath = sourceSets.tools.runtimeClasspath
+    def webClassesDir = sourceSets.main.output.classesDirs.asPath
+    def resourcesDir = rootProject.file('src/main/resources').absolutePath
+    def distWebDir = rootProject.file('dist/web').absolutePath
+    args = [webClassesDir, resourcesDir, distWebDir]
+    jvmArgs = ['-Dfile.encoding=UTF-8', '-Djava.awt.headless=true', '-Xmx1024m']
+}
+
+tasks.register('copyWebAppAssets', Copy) {
+    from('webapp') {
+        include '**/*'
+        include '.*'
+    }
+    into(rootProject.file('dist/web'))
+}
+
+tasks.register('buildWebDist') {
+    group = 'build'
+    description = 'Builds self-contained HTML5 / iPhone 17 PWA distribution in dist/web'
+    dependsOn tasks.named('compileTeaVm'), tasks.named('copyWebAppAssets')
+}
+
+tasks.register('serveWebLan', JavaExec) {
+    group = 'application'
+    description = 'Builds dist/web and launches a LAN Wi-Fi HTTP server for testing on iPhone 17 & PC browser'
+    dependsOn tasks.named('buildWebDist')
+    mainClass = 'com.loan12suquan.hd.web.build.WebLanServer'
+    classpath = sourceSets.tools.runtimeClasspath
+    args = [rootProject.file('dist/web').absolutePath, '8080']
+    jvmArgs = ['-Dfile.encoding=UTF-8']
+}

@@ -1,0 +1,62 @@
+name: Build & Deploy Loạn 12 Sứ Quân HD (Web PWA & PC JAR)
+
+on:
+  push:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build PC Desktop JAR & Web / iPhone 17 PWA Bundle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew jar :web:buildWebDist --no-daemon
+
+      - name: Upload PC Desktop Fat JAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Loan12SuQuan-HD-PC-Desktop
+          path: build/libs/Loan12SuQuan-HD-*.jar
+          if-no-files-found: error
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Web / iPhone 17 PWA Artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/web
+
+  deploy-pages:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

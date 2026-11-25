@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Chạy Loạn 12 Sứ Quân HD (LibGDX)" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.loan12suquan.hd.DesktopLauncher" />
+    <module name="Loan12SuQuanHD.main" />
+    <option name="VM_PARAMETERS" value="-Dfile.encoding=UTF-8 -Xms256m -Xmx1024m" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
