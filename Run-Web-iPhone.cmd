@@ -1,12 +1,11 @@
 @echo off
 setlocal
-chcp 65001 >nul
 cd /d "%~dp0"
 if exist "%USERPROFILE%\.jdks\corretto-19.0.2\bin\java.exe" (
     set "JAVA_HOME=%USERPROFILE%\.jdks\corretto-19.0.2"
 )
 echo ======================================================================
-echo   LOAN 12 SU QUAN HD — MAY CHU LAN WI-FI CHO IPHONE 17 ^& TRINH DUYET
+echo   LOAN 12 SU QUAN HD - MAY CHU LAN WI-FI CHO IPHONE 17 ^& TRINH DUYET
 echo ======================================================================
 if not exist "dist\web\index.html" (
     echo [1/2] Chua co ban build Web, dang dong goi dist\web...
